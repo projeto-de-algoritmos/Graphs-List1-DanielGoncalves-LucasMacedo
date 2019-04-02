@@ -7,6 +7,9 @@ RED = (139, 0, 0)
 GREEN = (0, 255, 0)
 BLUE = (0, 0, 139)
 YELLOW = (222, 178, 0)
+PINK = (225, 96, 253)
+PURPLE = (141, 96, 207)
+BROWN = (99, 75, 39)
 
 BORDER_THICKNESS = 1.0
 
@@ -65,9 +68,13 @@ class Node():
         self.left_border.render(background)
 
 class Maze():
-    def __init__(self):
+    def __init__(self, initial_x, initial_y, final_x, final_y):
         self.maze = []
         self.total_nodes = 0
+        self.initial_coordinate_x = initial_x
+        self.initial_coordinate_y = initial_y
+        self.final_coordinate_x = final_x
+        self.final_coordinate_y = final_y
 
         x = 0
         y = 0
@@ -182,18 +189,23 @@ class Maze():
                 else:
                     stack.pop()
                     current_cell = stack[-1]
+    
+    def bfs(self):
+        pass
                     
     def render(self, background):
         for i in range(0, int(HEIGHT / SIZE)):
             for j in range(0, int(WIDTH / SIZE)):
                 self.maze[i][j].render(background)
+        self.maze[self.initial_coordinate_x][self.initial_coordinate_y].color = BROWN
+        self.maze[self.final_coordinate_x][self.final_coordinate_y].color = PURPLE
 
 class Player():
-    def __init__(self):
-        self.pos_x = POS_X_PLAYER + BORDER_THICKNESS
-        self.pos_y = POS_Y_PLAYER + BORDER_THICKNESS
-        self.matrix_pos_x = 0
-        self.matrix_pos_y = 0
+    def __init__(self, initial_x, initial_y):
+        self.pos_x = initial_x * SIZE + BORDER_THICKNESS
+        self.pos_y = initial_y * SIZE + BORDER_THICKNESS
+        self.matrix_pos_x = initial_x
+        self.matrix_pos_y = initial_y
         self.width = SIZE - 2 * BORDER_THICKNESS
         self.height = SIZE - 2 * BORDER_THICKNESS
         self.color = RED
@@ -201,16 +213,16 @@ class Player():
     def update(self, maze):
         for event in pygame.event.get():
             if event.type == pygame.KEYDOWN:
-                if event.key == pygame.K_LEFT and self.pos_x > BORDER_THICKNESS and maze[self.matrix_pos_x][self.matrix_pos_y].left_border.color == maze[self.matrix_pos_x][self.matrix_pos_y].color:
+                if event.key == pygame.K_LEFT and self.pos_x > BORDER_THICKNESS and (maze[self.matrix_pos_x][self.matrix_pos_y].left_border.color != BLACK):
                     self.pos_x -= SIZE
                     self.matrix_pos_x -= 1
-                if event.key == pygame.K_RIGHT and self.pos_x + BORDER_THICKNESS < WIDTH - SIZE and maze[self.matrix_pos_x][self.matrix_pos_y].right_border.color == maze[self.matrix_pos_x][self.matrix_pos_y].color:
+                if event.key == pygame.K_RIGHT and self.pos_x + BORDER_THICKNESS < WIDTH - SIZE and (maze[self.matrix_pos_x][self.matrix_pos_y].right_border.color != BLACK):
                     self.pos_x += SIZE
                     self.matrix_pos_x += 1
-                if event.key == pygame.K_UP and self.pos_y > BORDER_THICKNESS and maze[self.matrix_pos_x][self.matrix_pos_y].top_border.color == maze[self.matrix_pos_x][self.matrix_pos_y].color: 
+                if event.key == pygame.K_UP and self.pos_y > BORDER_THICKNESS and (maze[self.matrix_pos_x][self.matrix_pos_y].top_border.color != BLACK): 
                     self.pos_y -= SIZE
                     self.matrix_pos_y -= 1
-                if event.key == pygame.K_DOWN and self.pos_y + BORDER_THICKNESS < HEIGHT - SIZE and maze[self.matrix_pos_x][self.matrix_pos_y].bottom_border.color == maze[self.matrix_pos_x][self.matrix_pos_y].color:
+                if event.key == pygame.K_DOWN and self.pos_y + BORDER_THICKNESS < HEIGHT - SIZE and (maze[self.matrix_pos_x][self.matrix_pos_y].bottom_border.color != BLACK):
                     self.pos_y += SIZE
                     self.matrix_pos_y += 1
 
@@ -229,9 +241,13 @@ class Game():
     def load(self):
         self.background = pygame.display.set_mode(SCREEN_SIZE)
         pygame.display.set_caption('Maze Game')
-        self.maze = Maze()
+        initial_coordinate_x = random.randint(0, int(HEIGHT / SIZE))
+        initial_coordinate_y = random.randint(0, int(WIDTH / SIZE))
+        final_coordinate_x = random.randint(0, int(HEIGHT / SIZE))
+        final_coordinate_y = random.randint(0, int(WIDTH / SIZE))
+        self.maze = Maze(initial_coordinate_x, initial_coordinate_y, final_coordinate_x, final_coordinate_y)
         self.maze.dfs()
-        self.player = Player()
+        self.player = Player(initial_coordinate_x, initial_coordinate_y)
         
                 
     def unload(self):
