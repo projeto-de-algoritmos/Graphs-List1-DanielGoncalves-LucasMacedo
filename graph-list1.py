@@ -18,64 +18,69 @@ POS_Y_INIT = 0
 SIZE = 20
 
 class NodeBorder():
-    def __init__(self):
+    def __init__(self, pos_x, pos_y, width, height):
         self.color = WHITE
         self.thickness = BORDER_THICKNESS
-        self.pos_x = 0.0
-        self.pos_y = 0.0
-
-    def render(self, pos_x, pos_y, width, height, background):
         self.pos_x = pos_x
         self.pos_y = pos_y
+        self.width = width
+        self.height = height
 
-        pygame.draw.rect(background, self.color, [self.pos_x, self.pos_y, width, height])
+    def render(self, background):
+        pygame.draw.rect(background, self.color, [self.pos_x, self.pos_y, self.width, self.height])
 
 
 class Node():
-    def __init__(self):
-        self.rect = None
+    def __init__(self, pos_x, pos_y):
 
-        self.top_border = NodeBorder()
-        self.bottom_border = NodeBorder()
-        self.right_border = NodeBorder()
-        self.left_border = NodeBorder()
 
         self.color = BLUE
 
-        self.pos_x = 0.0
-        self.pos_y = 0.0
+        self.pos_x = pos_x
+        self.pos_y = pos_y
         self.width = SIZE
         self.height = SIZE
 
+        self.top_border = NodeBorder(self.pos_x, self.pos_y, SIZE, BORDER_THICKNESS)
+        self.bottom_border = NodeBorder(self.pos_x, self.pos_y + SIZE - BORDER_THICKNESS, SIZE, BORDER_THICKNESS)
+        self.right_border = NodeBorder(self.pos_x + SIZE - BORDER_THICKNESS, self.pos_y, BORDER_THICKNESS, SIZE)
+        self.left_border = NodeBorder(self.pos_x, self.pos_y, BORDER_THICKNESS, SIZE)
+
         self.neighbors = []
 
-    def render(self, pos_x, pos_y, background):
-        self.pos_x = pos_x
-        self.pos_y = pos_y
+    def render(self, background):
+        pygame.draw.rect(background, self.color, [self.pos_x, self.pos_y, self.width, self.height])
 
-        self.rect = pygame.draw.rect(background, self.color, [self.pos_x, self.pos_y, self.width, self.height])
-
-        self.left_border.render(self.pos_x, self.pos_y, BORDER_THICKNESS, SIZE, background)
-        self.right_border.render(self.pos_x + SIZE - BORDER_THICKNESS, self.pos_y, BORDER_THICKNESS, SIZE, background)
-        self.top_border.render(self.pos_x, self.pos_y, SIZE, BORDER_THICKNESS, background)
-        self.bottom_border.render(self.pos_x, self.pos_y + SIZE - BORDER_THICKNESS, SIZE, BORDER_THICKNESS, background)
+        self.top_border.render(background)
+        self.bottom_border.render(background)
+        self.right_border.render(background)
+        self.left_border.render(background)
 
 class Maze():
     def __init__(self):
-        self.maze = Node()
-        #self.maze = [[0 for x in range(int(WIDTH / SIZE))] for y in range(int(HEIGHT / SIZE))]
-    def render(self, background):
+        self.maze = []
+        x = 0
+        y = 0
         for i in range(0, WIDTH, SIZE):
+            self.maze.append([])
             for j in range(0, HEIGHT, SIZE):
-                self.maze.render(i, j, background)
+                self.maze[x].append(Node(i , j))
+                y += 1
+            x += 1
+                
+    def render(self, background):
+        for i in range(0, int(HEIGHT / SIZE)):
+            for j in range(0, int(WIDTH / SIZE)):
+                self.maze[i][j].render(background)
+
     # stack - pop push
 
 class Player():
     def __init__(self):
-        self.pos_x = POS_X_INIT + 1.0
-        self.pos_y = POS_Y_INIT + 1.0
-        self.width = SIZE - 2.0
-        self.height = SIZE - 2.0
+        self.pos_x = POS_X_INIT + BORDER_THICKNESS
+        self.pos_y = POS_Y_INIT + BORDER_THICKNESS
+        self.width = SIZE - 2 * BORDER_THICKNESS
+        self.height = SIZE - 2 * BORDER_THICKNESS
         self.color = RED 
 
     def update(self):
