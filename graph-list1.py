@@ -9,7 +9,7 @@ BLUE = (0, 0, 139)
 YELLOW = (222, 178, 0)
 PINK = (225, 96, 253)
 PURPLE = (141, 96, 207)
-BROWN = (99, 75, 39)
+BROWN = (222, 184, 135)
 
 BORDER_THICKNESS = 1.0
 
@@ -68,9 +68,10 @@ class Node():
         self.left_border.render(background)
 
 class Maze():
-    def __init__(self, initial_x, initial_y, final_x, final_y):
+    def __init__(self, background, initial_x, initial_y, final_x, final_y):
         self.maze = []
         self.total_nodes = 0
+        self.maze_created = False
         self.initial_coordinate_x = initial_x
         self.initial_coordinate_y = initial_y
         self.final_coordinate_x = final_x
@@ -87,6 +88,7 @@ class Maze():
             x += 1
 
         self.define_neighbors()
+        self.dfs(background)
 
     def add_edge(self, node, neighbor):
         neighbor.neighbors_connected.append(node)
@@ -153,7 +155,7 @@ class Maze():
             node.top_border.color = color
             neightbor.bottom_border.color = color
     
-    def dfs(self):
+    def dfs(self, background):
         current_cell = random.choice(random.choice(self.maze))
         current_cell.visited = True
         current_cell.color = GREEN
@@ -174,7 +176,7 @@ class Maze():
             if len(current_cell.neighbors) > 0:
                 random_neighbor = random.choice(current_cell.neighbors)
 
-                self.break_border(current_cell, random_neighbor, YELLOW)
+                self.break_border(current_cell, random_neighbor, GREEN)
 
                 self.add_edge(current_cell, random_neighbor)
                 current_cell = random_neighbor
@@ -184,11 +186,25 @@ class Maze():
                 visited_cells += 1
             else:
                 current_cell.color = YELLOW
+
+                if current_cell.top_border.color == GREEN:
+                    current_cell.top_border.color = YELLOW
+                if current_cell.bottom_border.color == GREEN:
+                    current_cell.bottom_border.color = YELLOW
+                if current_cell.right_border.color == GREEN:
+                    current_cell.right_border.color = YELLOW
+                if current_cell.left_border.color == GREEN:
+                    current_cell.left_border.color = YELLOW
+                    
                 if len(stack) == 1:
                     stack.pop()
                 else:
                     stack.pop()
                     current_cell = stack[-1]
+            self.render(background)
+            CLOCK.tick(60)
+            pygame.display.update()
+        self.maze_created = True
     
     def bfs(self):
         pass
@@ -197,8 +213,9 @@ class Maze():
         for i in range(0, int(HEIGHT / SIZE)):
             for j in range(0, int(WIDTH / SIZE)):
                 self.maze[i][j].render(background)
-        self.maze[self.initial_coordinate_x][self.initial_coordinate_y].color = BROWN
-        self.maze[self.final_coordinate_x][self.final_coordinate_y].color = PURPLE
+        if self.maze_created:
+            self.maze[self.initial_coordinate_x][self.initial_coordinate_y].color = BROWN
+            self.maze[self.final_coordinate_x][self.final_coordinate_y].color = PURPLE
 
 class Player():
     def __init__(self, initial_x, initial_y):
@@ -245,8 +262,7 @@ class Game():
         initial_coordinate_y = random.randint(0, int(WIDTH / SIZE))
         final_coordinate_x = random.randint(0, int(HEIGHT / SIZE))
         final_coordinate_y = random.randint(0, int(WIDTH / SIZE))
-        self.maze = Maze(initial_coordinate_x, initial_coordinate_y, final_coordinate_x, final_coordinate_y)
-        self.maze.dfs()
+        self.maze = Maze(self.background, initial_coordinate_x, initial_coordinate_y, final_coordinate_x, final_coordinate_y)
         self.player = Player(initial_coordinate_x, initial_coordinate_y)
         
                 
