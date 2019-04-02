@@ -79,16 +79,16 @@ class Maze():
                 y += 1
             x += 1
 
-        self.define_neightbors()
+        self.define_neighbors()
 
-    def add_edge(self, u, v):
-        u.neighbors_connected.append(v)
-        v.neighbors_connected.append(u)
+    def add_edge(self, node, neighbor):
+        neighbor.neighbors_connected.append(node)
+        node.neighbors_connected.append(neighbor)
 
-    def remove_neightbors_visited(self, node):
+    def remove_neighbors_visited(self, node):
         node.neighbors = [x for x in node.neighbors if not x.visited]
  
-    def define_neightbors(self):
+    def define_neighbors(self):
         for i in range(0, int(HEIGHT / SIZE)):
             for j in range(0, int(WIDTH / SIZE)):
                 self.maze[i][j].matrix_pos_x = i
@@ -126,8 +126,26 @@ class Maze():
                     self.maze[i][j].neighbors.append(self.maze[i + 1][j]) # bot
                     self.maze[i][j].neighbors.append(self.maze[i - 1][j]) # top
                     self.maze[i][j].neighbors.append(self.maze[i][j - 1]) # left
-            print('[NEIGHTBORS ' + str(len(self.maze[i][j].neighbors)) + ']')
+            print('[NEIGHBORS ' + str(len(self.maze[i][j].neighbors)) + ']')
 
+    def break_border(self, node, neightbor, color):
+        # right
+        if (neightbor.matrix_pos_x == node.matrix_pos_x + 1) and (neightbor.matrix_pos_y == node.matrix_pos_y):
+            node.right_border.color = color
+            neightbor.left_border.color = color
+        # left
+        elif (neightbor.matrix_pos_x == node.matrix_pos_x - 1) and (neightbor.matrix_pos_y == node.matrix_pos_y):
+            node.left_border.color = color
+            neightbor.right_border.color = color
+        # bot
+        elif (neightbor.matrix_pos_x == node.matrix_pos_x) and (neightbor.matrix_pos_y == node.matrix_pos_y + 1):
+            node.bottom_border.color = color
+            neightbor.top_border.color = color
+        # top
+        elif (neightbor.matrix_pos_x == node.matrix_pos_x) and (neightbor.matrix_pos_y == node.matrix_pos_y - 1):
+            node.top_border.color = color
+            neightbor.bottom_border.color = color
+    
     def dfs(self):
         current_cell = random.choice(random.choice(self.maze))
         current_cell.visited = True
@@ -137,18 +155,20 @@ class Maze():
         
         print('[POS X MATRIX ' + str(current_cell.matrix_pos_x) + ']')
         print('[POS Y MATRIX ' + str(current_cell.matrix_pos_y) + ']')
-        print('[NEIGHTBORS ' + str(len(current_cell.neighbors)) + ']')
+        print('[NEIGHBORS ' + str(len(current_cell.neighbors)) + ']')
 
         while visited_cells != self.total_nodes or len(stack) != 0:
             print('[TOTAL NODES ' + str(self.total_nodes) + ']')
             print('[VISITED NODES ' + str(visited_cells) + ']')
             print('[STACK ' + str(len(stack)) + ']')
-            print('[NEIGHTBORS ' + str(len(current_cell.neighbors)) + ']')
+            print('[NEIGHBORS ' + str(len(current_cell.neighbors)) + ']')
             
-            self.remove_neightbors_visited(current_cell)
+            self.remove_neighbors_visited(current_cell)
             if len(current_cell.neighbors) > 0:
                 random_neighbor = random.choice(current_cell.neighbors)
-                # TODO: remover parede entre as celulas atual e vizinho
+
+                self.break_border(current_cell, random_neighbor, YELLOW)
+
                 self.add_edge(current_cell, random_neighbor)
                 current_cell = random_neighbor
                 stack.append(current_cell)
@@ -164,13 +184,10 @@ class Maze():
                     current_cell = stack[-1]
                     
     def render(self, background):
-        y = 0
         for i in range(0, int(HEIGHT / SIZE)):
             for j in range(0, int(WIDTH / SIZE)):
                 self.maze[i][j].render(background)
-                if(self.maze[i][j].color == YELLOW):
-                    y += 1
-        # print("DEBUG YELLOW " + str(y))
+
 class Player():
     def __init__(self):
         self.pos_x = POS_X_INIT + BORDER_THICKNESS
