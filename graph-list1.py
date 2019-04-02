@@ -14,8 +14,8 @@ WIDTH = 600
 HEIGHT = 600
 SCREEN_SIZE = (WIDTH, HEIGHT)
 
-POS_X_INIT = 0
-POS_Y_INIT = 0
+POS_X_PLAYER = 0
+POS_Y_PLAYER = 0
 
 SIZE = 20
 CLOCK = pygame.time.Clock()
@@ -68,9 +68,9 @@ class Maze():
     def __init__(self):
         self.maze = []
         self.total_nodes = 0
+
         x = 0
         y = 0
-
         for i in range(0, WIDTH, SIZE):
             self.maze.append([])
             for j in range(0, HEIGHT, SIZE):
@@ -190,23 +190,29 @@ class Maze():
 
 class Player():
     def __init__(self):
-        self.pos_x = POS_X_INIT + BORDER_THICKNESS
-        self.pos_y = POS_Y_INIT + BORDER_THICKNESS
+        self.pos_x = POS_X_PLAYER + BORDER_THICKNESS
+        self.pos_y = POS_Y_PLAYER + BORDER_THICKNESS
+        self.matrix_pos_x = 0
+        self.matrix_pos_y = 0
         self.width = SIZE - 2 * BORDER_THICKNESS
         self.height = SIZE - 2 * BORDER_THICKNESS
         self.color = RED
 
-    def update(self):
+    def update(self, maze):
         for event in pygame.event.get():
             if event.type == pygame.KEYDOWN:
-                if event.key == pygame.K_LEFT and self.pos_x > BORDER_THICKNESS:
+                if event.key == pygame.K_LEFT and self.pos_x > BORDER_THICKNESS and maze[self.matrix_pos_x][self.matrix_pos_y].left_border.color == maze[self.matrix_pos_x][self.matrix_pos_y].color:
                     self.pos_x -= SIZE
-                if event.key == pygame.K_RIGHT and self.pos_x + BORDER_THICKNESS < WIDTH - SIZE:
+                    self.matrix_pos_x -= 1
+                if event.key == pygame.K_RIGHT and self.pos_x + BORDER_THICKNESS < WIDTH - SIZE and maze[self.matrix_pos_x][self.matrix_pos_y].right_border.color == maze[self.matrix_pos_x][self.matrix_pos_y].color:
                     self.pos_x += SIZE
-                if event.key == pygame.K_UP and self.pos_y > BORDER_THICKNESS: 
+                    self.matrix_pos_x += 1
+                if event.key == pygame.K_UP and self.pos_y > BORDER_THICKNESS and maze[self.matrix_pos_x][self.matrix_pos_y].top_border.color == maze[self.matrix_pos_x][self.matrix_pos_y].color: 
                     self.pos_y -= SIZE
-                if event.key == pygame.K_DOWN and self.pos_y + BORDER_THICKNESS < HEIGHT - SIZE:
+                    self.matrix_pos_y -= 1
+                if event.key == pygame.K_DOWN and self.pos_y + BORDER_THICKNESS < HEIGHT - SIZE and maze[self.matrix_pos_x][self.matrix_pos_y].bottom_border.color == maze[self.matrix_pos_x][self.matrix_pos_y].color:
                     self.pos_y += SIZE
+                    self.matrix_pos_y += 1
 
     def render(self, background):
         pygame.draw.rect(background, self.color, [self.pos_x, self.pos_y, self.width, self.height])
@@ -232,7 +238,7 @@ class Game():
         pass
 
     def update(self):
-        self.player.update()
+        self.player.update(self.maze.maze)
 
     def render(self):
         self.background.fill(BLACK)
