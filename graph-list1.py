@@ -6,6 +6,7 @@ BLACK = (0, 0, 0)
 RED = (139, 0, 0)
 GREEN = (0, 255, 0)
 BLUE = (0, 0, 139)
+YELLOW = (222, 178, 0)
 
 BORDER_THICKNESS = 1.0
 
@@ -17,10 +18,11 @@ POS_X_INIT = 0
 POS_Y_INIT = 0
 
 SIZE = 20
+CLOCK = pygame.time.Clock()
 
 class NodeBorder():
     def __init__(self, pos_x, pos_y, width, height):
-        self.color = WHITE
+        self.color = BLACK
         self.thickness = BORDER_THICKNESS
         self.pos_x = pos_x
         self.pos_y = pos_y
@@ -77,9 +79,15 @@ class Maze():
                 y += 1
             x += 1
 
-
         self.define_neightbors()
 
+    def add_edge(self, u, v):
+        u.neighbors_connected.append(v)
+        v.neighbors_connected.append(u)
+
+    def remove_neightbors_visited(self, node):
+        node.neighbors = [x for x in node.neighbors if not x.visited]
+ 
     def define_neightbors(self):
         for i in range(0, int(HEIGHT / SIZE)):
             for j in range(0, int(WIDTH / SIZE)):
@@ -121,55 +129,55 @@ class Maze():
             print('[NEIGHTBORS ' + str(len(self.maze[i][j].neighbors)) + ']')
 
     def dfs(self):
-        random_cell_row = random.choice(self.maze)
-        current_cell = random.choice(random_cell_row)
-
+        current_cell = random.choice(random.choice(self.maze))
+        current_cell.visited = True
+        current_cell.color = GREEN
+        stack = [current_cell]
+        visited_cells = 1
+        
         print('[POS X MATRIX ' + str(current_cell.matrix_pos_x) + ']')
         print('[POS Y MATRIX ' + str(current_cell.matrix_pos_y) + ']')
-
-        visited_cells = 1
-        stack = []
-        
         print('[NEIGHTBORS ' + str(len(current_cell.neighbors)) + ']')
 
-        while (visited_cells != self.total_nodes):
-            current_cell.visited = True
-            current_cell.color = GREEN
-
+        while visited_cells != self.total_nodes or len(stack) != 0:
+            print('[TOTAL NODES ' + str(self.total_nodes) + ']')
+            print('[VISITED NODES ' + str(visited_cells) + ']')
             print('[STACK ' + str(len(stack)) + ']')
-
             print('[NEIGHTBORS ' + str(len(current_cell.neighbors)) + ']')
-            # print(stack)
-            if len(current_cell.neighbors) != 0:
-                random_neightboor = random.choice(current_cell.neighbors)
-
-                print("DEBUG VIZINHOS DO VIZINHO " + str(len(random_neightboor.neighbors)))
-                print(current_cell)
-
-                current_cell.neighbors.remove(random_neightboor)
-                print("PT2 VIZINHOS " + str(len(current_cell.neighbors)))
-                current_cell.neighbors_connected.append(random_neightboor)
+            
+            self.remove_neightbors_visited(current_cell)
+            if len(current_cell.neighbors) > 0:
+                random_neighbor = random.choice(current_cell.neighbors)
+                # TODO: remover parede entre as celulas atual e vizinho
+                self.add_edge(current_cell, random_neighbor)
+                current_cell = random_neighbor
                 stack.append(current_cell)
-                current_cell = random_neightboor
+                current_cell.visited = True
+                current_cell.color = GREEN
                 visited_cells += 1
             else:
-                stack.pop()
-                current_cell = stack[-1]
-                current_cell.color = RED
-                
+                current_cell.color = YELLOW
+                if len(stack) == 1:
+                    stack.pop()
+                else:
+                    stack.pop()
+                    current_cell = stack[-1]
+                    
     def render(self, background):
+        y = 0
         for i in range(0, int(HEIGHT / SIZE)):
             for j in range(0, int(WIDTH / SIZE)):
                 self.maze[i][j].render(background)
-        self.dfs()
-
+                if(self.maze[i][j].color == YELLOW):
+                    y += 1
+        # print("DEBUG YELLOW " + str(y))
 class Player():
     def __init__(self):
         self.pos_x = POS_X_INIT + BORDER_THICKNESS
         self.pos_y = POS_Y_INIT + BORDER_THICKNESS
         self.width = SIZE - 2 * BORDER_THICKNESS
         self.height = SIZE - 2 * BORDER_THICKNESS
-        self.color = RED 
+        self.color = RED
 
     def update(self):
         for event in pygame.event.get():
@@ -199,6 +207,7 @@ class Game():
         self.background = pygame.display.set_mode(SCREEN_SIZE)
         pygame.display.set_caption('Maze Game')
         self.maze = Maze()
+        self.maze.dfs()
         self.player = Player()
         
                 
