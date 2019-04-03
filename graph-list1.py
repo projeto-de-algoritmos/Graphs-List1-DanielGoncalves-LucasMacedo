@@ -1,7 +1,6 @@
 import sys
 import pygame
 import random
-import time
 
 WHITE = (255, 255, 255)
 BLACK = (0, 0, 0)
