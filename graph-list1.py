@@ -4,16 +4,19 @@ import random
 
 WHITE = (255, 255, 255)
 BLACK = (0, 0, 0)
-RED = (139, 0, 0)
+RED = (255, 0, 0)
 GREEN = (0, 255, 0)
-BLUE = (0, 0, 139)
+DARKGRAY = (169, 169, 169)
 YELLOW = (222, 178, 0)
 PINK = (225, 96, 253)
-PURPLE = (141, 96, 207)
-BROWN = (222, 184, 135)
+BLUE = (0, 0, 255)
+BROWN = (139, 69, 19)
 ORANGE = (255, 99, 71)
 DARKSLATEGRAY = (47, 79, 79)
-GRAY = (128, 128, 128)
+GRAY = (119, 136, 153)
+DARKBLUE = (0, 0, 139)
+MIDNIGHTBLUE = (25, 25, 1, 12)
+DARKRED = (139, 0, 0)
 
 BORDER_THICKNESS = 1.0
 
@@ -48,7 +51,7 @@ class NodeBorder():
 
 class Node():
     def __init__(self, pos_x, pos_y):
-        self.color = BLUE
+        self.color = DARKGRAY
 
         self.visited = False
         self.explored = False
@@ -145,7 +148,6 @@ class Maze():
                     self.maze[i][j].neighbors.append(self.maze[i + 1][j]) # bot
                     self.maze[i][j].neighbors.append(self.maze[i - 1][j]) # top
                     self.maze[i][j].neighbors.append(self.maze[i][j - 1]) # left
-            print('[NEIGHBORS ' + str(len(self.maze[i][j].neighbors)) + ']')
 
     def break_border(self, node, neightbor, color):
         # right
@@ -233,7 +235,7 @@ class Maze():
                     if i.matrix_pos_x == self.final_coordinate_x and i.matrix_pos_y == self.final_coordinate_y:
                         find = True
             self.render(background)
-            text(background, "SOLVING MAZE", WHITE, FONTSIZE_COMMANDS_INTIAL, 225, 620)
+            text(background, "SOLVING MAZE", WHITE, FONTSIZE_COMMANDS_INTIAL, 228, 620)
             player.render(background)
             pygame.display.update()
         
@@ -261,7 +263,7 @@ class Maze():
                 self.maze[i][j].render(background)
         if self.maze_created:
             self.maze[self.initial_coordinate_x][self.initial_coordinate_y].color = BROWN
-            self.maze[self.final_coordinate_x][self.final_coordinate_y].color = PURPLE
+            self.maze[self.final_coordinate_x][self.final_coordinate_y].color = BLUE
 
 class Player():
     def __init__(self, initial_x, initial_y):
@@ -328,12 +330,13 @@ class Game():
             self.winner = True
 
     def initial_game(self):
-        self.background.fill(DARKSLATEGRAY)
-        pygame.draw.rect(self.background, GRAY, [100, 100, 400, 450])
-        text(self.background, "MAZE ADVENTURES", WHITE, FONTSIZE_START, 125, 185)
-        pygame.draw.rect(self.background, YELLOW, [150, 310, 300, 100])
-        text(self.background, "PRESS (S) TO START GAME", BLACK, FONTSIZE_COMMANDS_INTIAL, 180, 330)
-        text(self.background, "PRESS (ESC) TO CLOSE GAME", BLACK, FONTSIZE_COMMANDS_INTIAL, 175, 360)
+        self.background.fill(MIDNIGHTBLUE)
+        pygame.draw.rect(self.background, DARKBLUE, [100, 100, 400, 450])
+        pygame.draw.rect(self.background, DARKRED, [110, 150, 380, 100])
+        text(self.background, "MAZE ADVENTURES", BLACK, FONTSIZE_START, 125, 185)
+        pygame.draw.rect(self.background, BLACK, [150, 320, 300, 100])
+        text(self.background, "PRESS (S) TO START GAME", ORANGE, FONTSIZE_COMMANDS_INTIAL, 180, 345)
+        text(self.background, "PRESS (ESC) TO CLOSE GAME", ORANGE, FONTSIZE_COMMANDS_INTIAL, 175, 375)
 
     def end_of_game(self):
         self.maze.bfs(self.background, self.player)
@@ -347,14 +350,14 @@ class Game():
 
         if not self.solved and not self.winner:
             text(self.background, "PRESS (R) TO RETRY GAME", WHITE, FONTSIZE_MAZE, 230, 610)
-            text(self.background, "PRESS (Q) TO GIVE UP", WHITE, FONTSIZE_MAZE, 232, 630)
+            text(self.background, "PRESS (Q) TO GIVE UP", WHITE, FONTSIZE_MAZE, 236, 630)
             text(self.background, "PRESS (ESC) TO CLOSE GAME", WHITE, FONTSIZE_MAZE, 222, 650)
         elif self.winner:
-            text(self.background, "YOU WIN", WHITE, FONTSIZE_MAZE + 3, 240, 610)
+            text(self.background, "YOU WIN", WHITE, FONTSIZE_MAZE + 3, 265, 610)
             text(self.background, "PRESS (R) TO RETRY GAME", WHITE, FONTSIZE_MAZE, 225, 630)
             text(self.background, "PRESS (ESC) TO CLOSE GAME", WHITE, FONTSIZE_MAZE, 220, 650)
         else:
-            text(self.background, "YOU LOSE", WHITE, FONTSIZE_MAZE + 3, 240, 610)
+            text(self.background, "YOU LOSE", WHITE, FONTSIZE_MAZE + 3, 265, 610)
             text(self.background, "PRESS (R) TO RETRY GAME", WHITE, FONTSIZE_MAZE, 225, 630)
             text(self.background, "PRESS (ESC) TO CLOSE GAME", WHITE, FONTSIZE_MAZE, 220, 650)
 
