@@ -212,7 +212,7 @@ class Maze():
                     stack.pop()
                     current_cell = stack[-1]
             self.render(background)
-            text(background, "GENERATING MAZE", WHITE, FONTSIZE_COMMANDS_INTIAL, 220, 620)
+            text(background, "GENERATING MAZE", WHITE, FONTSIZE_COMMANDS_INTIAL, 225, 620)
             pygame.display.update()
         self.maze_created = True
     
@@ -242,7 +242,7 @@ class Maze():
                     if i.matrix_pos_x == self.final_coordinate_x and i.matrix_pos_y == self.final_coordinate_y: # verificar se é o final do labirinto
                         find = True
             self.render(background)
-            text(background, "SOLVING MAZE", WHITE, FONTSIZE_COMMANDS_INTIAL, 220, 620)
+            text(background, "SOLVING MAZE", WHITE, FONTSIZE_COMMANDS_INTIAL, 225, 620)
             player.render(background)
             pygame.display.update()
         
@@ -308,26 +308,33 @@ class Game():
         except:
             print('The pygame module did not start successfully')
 
-        self.solved = False
+        self.initial_coordinate_x = 0
+        self.initial_coordinate_y = 0
+        self.final_coordinate_x = 0
+        self.final_coordinate_y = 0
         self.start = False
+        self.solved = False
+        self.winner = False
         self.exit = False
 
     def load(self):
         self.background = pygame.display.set_mode(SCREEN_SIZE)
         pygame.display.set_caption('Maze Game')
-        initial_coordinate_x = random.randint(0, int(HEIGHT / SIZE) - 1)
-        initial_coordinate_y = random.randint(0, int(WIDTH / SIZE) - 1)
-        final_coordinate_x = random.randint(0, int(HEIGHT / SIZE) - 1)
-        final_coordinate_y = random.randint(0, int(WIDTH / SIZE) - 1)
-        while final_coordinate_x == initial_coordinate_x or final_coordinate_y == initial_coordinate_y:
-            final_coordinate_x = random.randint(0, int(HEIGHT / SIZE) - 1)
-            final_coordinate_y = random.randint(0, int(WIDTH / SIZE) - 1)
-        self.maze = Maze(self.background, initial_coordinate_x, initial_coordinate_y, final_coordinate_x, final_coordinate_y)
-        self.player = Player(initial_coordinate_x, initial_coordinate_y)
+        self.initial_coordinate_x = random.randint(0, int(HEIGHT / SIZE) - 1)
+        self.initial_coordinate_y = random.randint(0, int(WIDTH / SIZE) - 1)
+        self.final_coordinate_x = random.randint(0, int(HEIGHT / SIZE) - 1)
+        self.final_coordinate_y = random.randint(0, int(WIDTH / SIZE) - 1)
+        while self.final_coordinate_x == self.initial_coordinate_x or self.final_coordinate_y == self.initial_coordinate_y:
+            self.final_coordinate_x = random.randint(0, int(HEIGHT / SIZE) - 1)
+            self.final_coordinate_y = random.randint(0, int(WIDTH / SIZE) - 1)
+        self.maze = Maze(self.background, self.initial_coordinate_x, self.initial_coordinate_y, self.final_coordinate_x, self.final_coordinate_y)
+        self.player = Player(self.initial_coordinate_x, self.initial_coordinate_y)
 
     def update(self, event):
-        if not self.solved:
+        if not self.solved and not self.winner:
             self.player.update(self.maze.maze, event)
+        if self.player.matrix_pos_x == self.final_coordinate_x and self.player.matrix_pos_y == self.final_coordinate_y:
+            self.winner = True
 
     def initial_game(self):
         self.background.fill(DARKSLATEGRAY)
@@ -338,7 +345,6 @@ class Game():
         text(self.background, "PRESS (ESC) TO CLOSE GAME", BLACK, FONTSIZE_COMMANDS_INTIAL, 175, 360)
 
     def end_of_game(self):
-        
         self.maze.bfs(self.background, self.player)
 
     def render(self):
@@ -347,13 +353,20 @@ class Game():
         self.maze.render(self.background)
 
         self.player.render(self.background)
-        if not self.solved:
+
+        if not self.solved and not self.winner:
             text(self.background, "PRESS (R) TO RETRY GAME", WHITE, FONTSIZE_MAZE, 230, 610)
             text(self.background, "PRESS (Q) TO GIVE UP", WHITE, FONTSIZE_MAZE, 232, 630)
             text(self.background, "PRESS (ESC) TO CLOSE GAME", WHITE, FONTSIZE_MAZE, 222, 650)
+        elif self.winner:
+            text(self.background, "YOU WIN", WHITE, FONTSIZE_MAZE + 3, 240, 610)
+            text(self.background, "PRESS (R) TO RETRY GAME", WHITE, FONTSIZE_MAZE, 225, 630)
+            text(self.background, "PRESS (ESC) TO CLOSE GAME", WHITE, FONTSIZE_MAZE, 220, 650)
         else:
-            text(self.background, "PRESS (R) TO RETRY GAME", WHITE, FONTSIZE_MAZE, 230, 620)
-            text(self.background, "PRESS (ESC) TO CLOSE GAME", WHITE, FONTSIZE_MAZE, 222, 640)
+            text(self.background, "YOU LOSE", WHITE, FONTSIZE_MAZE + 3, 240, 610)
+            text(self.background, "PRESS (R) TO RETRY GAME", WHITE, FONTSIZE_MAZE, 225, 630)
+            text(self.background, "PRESS (ESC) TO CLOSE GAME", WHITE, FONTSIZE_MAZE, 220, 650)
+
         pygame.display.update()
 
     def run(self):
@@ -376,12 +389,15 @@ class Game():
             if pygame.event.get(pygame.QUIT) or pygame.key.get_pressed()[pygame.K_ESCAPE]:
                 self.exit = True
             e = pygame.event.get()
+            if self.winner:
+                self.background.fill(BLACK)
             for event in e:
                 if event.type == pygame.KEYDOWN:
                     if event.key == pygame.K_r:
                         self.solved = False
+                        self.winner = False
                         self.run()
-                    if not self.solved and event.key == pygame.K_q:
+                    if not self.solved and event.key == pygame.K_q and not self.winner:
                         self.background.fill(BLACK)
                         self.end_of_game()
                         self.solved = True
