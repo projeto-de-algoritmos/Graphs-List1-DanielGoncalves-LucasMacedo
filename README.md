@@ -60,7 +60,7 @@ if one pulled and stretched out the paths in the maze in the proper way, the res
 >     1. Pop a cell from the stack <br>
 >     2. Make it the current cell <br>
 
-![generate-maze](#gifs/generate_maze.gif)
+<br> ![generate-maze](gifs/generate_maze.gif) <br>
 
 ### Maze solving algorithm
 
@@ -81,7 +81,7 @@ if one pulled and stretched out the paths in the maze in the proper way, the res
 > 5. While the father of the node's parent is not empty <br>
 >   1. Assign the current node as your parent, to walk the way back <br>
        
-![solving-maze](#gifs/solving_maze.gif)
+<br> ![solving-maze](gifs/solving_maze.gif) <br>
 
 ## References
 
