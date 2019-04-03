@@ -172,16 +172,7 @@ class Maze():
         stack = [current_cell]
         visited_cells = 1
         
-        print('[POS X MATRIX ' + str(current_cell.matrix_pos_x) + ']')
-        print('[POS Y MATRIX ' + str(current_cell.matrix_pos_y) + ']')
-        print('[NEIGHBORS ' + str(len(current_cell.neighbors)) + ']')
-
         while visited_cells != self.total_nodes or len(stack) != 0:
-            print('[TOTAL NODES ' + str(self.total_nodes) + ']')
-            print('[VISITED NODES ' + str(visited_cells) + ']')
-            print('[STACK ' + str(len(stack)) + ']')
-            print('[NEIGHBORS ' + str(len(current_cell.neighbors)) + ']')
-            
             self.remove_neighbors_visited(current_cell)
             if len(current_cell.neighbors) > 0:
                 random_neighbor = random.choice(current_cell.neighbors)
@@ -222,7 +213,7 @@ class Maze():
         find = False
         queue = [initial_node]
         while len(queue) > 0 and not find:
-            queue[0].color = PINK # pintar primeiro nó da fila -> u
+            queue[0].color = PINK
 
             if queue[0].top_border.color == YELLOW:
                 queue[0].top_border.color = PINK
@@ -233,13 +224,13 @@ class Maze():
             if queue[0].left_border.color == YELLOW:
                 queue[0].left_border.color = PINK
 
-            u = queue.pop(0) # remover primeiro nó da fila -> u
-            for i in u.neighbors_connected: # para cada v (nó vizinho) de u
-                if i.explored == False: # se v não foi explorado
+            u = queue.pop(0)
+            for i in u.neighbors_connected:
+                if i.explored == False:
                     i.parent = u
-                    i.explored = True # marque v como explorado
-                    queue.append(i) # coloque v no fim da fila
-                    if i.matrix_pos_x == self.final_coordinate_x and i.matrix_pos_y == self.final_coordinate_y: # verificar se é o final do labirinto
+                    i.explored = True
+                    queue.append(i)
+                    if i.matrix_pos_x == self.final_coordinate_x and i.matrix_pos_y == self.final_coordinate_y:
                         find = True
             self.render(background)
             text(background, "SOLVING MAZE", WHITE, FONTSIZE_COMMANDS_INTIAL, 225, 620)
