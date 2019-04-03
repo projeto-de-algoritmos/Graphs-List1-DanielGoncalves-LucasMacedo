@@ -1,3 +1,4 @@
+
 import pygame
 import random
 
@@ -10,18 +11,27 @@ YELLOW = (222, 178, 0)
 PINK = (225, 96, 253)
 PURPLE = (141, 96, 207)
 BROWN = (222, 184, 135)
+ORANGE = (255, 99, 71)
+DARKSLATEGRAY = (47, 79, 79)
+GRAY = (128, 128, 128)
 
 BORDER_THICKNESS = 1.0
 
+HEIGHT_TOTAL = 680
 WIDTH = 600
 HEIGHT = 600
-SCREEN_SIZE = (WIDTH, HEIGHT)
+SCREEN_SIZE = (WIDTH, HEIGHT_TOTAL)
 
-POS_X_PLAYER = 0
-POS_Y_PLAYER = 0
+FONTSIZE_START = 50
+FONTSIZE_COMMANDS_INTIAL = 25
+FONTSIZE_MAZE = 20
 
 SIZE = 20
-CLOCK = pygame.time.Clock()
+
+def text(background, message, color, size, coordinate_x, coordinate_y):
+    font = pygame.font.SysFont(None, size)
+    text = font.render(message, True, color)
+    background.blit(text, [coordinate_x, coordinate_y])
 
 class NodeBorder():
     def __init__(self, pos_x, pos_y, width, height):
@@ -57,8 +67,8 @@ class Node():
         self.left_border = NodeBorder(self.pos_x, self.pos_y, BORDER_THICKNESS, SIZE)
 
         self.neighbors = []
-
         self.neighbors_connected = []
+        self.parent = None
 
     def render(self, background):
         pygame.draw.rect(background, self.color, [self.pos_x, self.pos_y, self.width, self.height])
@@ -89,8 +99,6 @@ class Maze():
             x += 1
 
         self.define_neighbors()
-        self.dfs(background)
-        self.bfs(background)
 
     def add_edge(self, node, neighbor):
         neighbor.neighbors_connected.append(node)
@@ -204,15 +212,14 @@ class Maze():
                     stack.pop()
                     current_cell = stack[-1]
             self.render(background)
-            CLOCK.tick(200)
+            text(background, "GENERATING MAZE", WHITE, FONTSIZE_COMMANDS_INTIAL, 220, 620)
             pygame.display.update()
         self.maze_created = True
     
-    def bfs(self, background):
-        initial_node = self.maze[self.initial_coordinate_x][self.initial_coordinate_y]
+    def bfs(self, background, player):
+        initial_node = self.maze[player.matrix_pos_x][player.matrix_pos_y]
         initial_node.explored = True
         find = False
-        explored = [initial_node]
         queue = [initial_node]
         while len(queue) > 0 and not find:
             queue[0].color = PINK # pintar primeiro nó da fila -> u
@@ -229,14 +236,30 @@ class Maze():
             u = queue.pop(0) # remover primeiro nó da fila -> u
             for i in u.neighbors_connected: # para cada v (nó vizinho) de u
                 if i.explored == False: # se v não foi explorado
+                    i.parent = u
                     i.explored = True # marque v como explorado
-                    explored.append(i)
                     queue.append(i) # coloque v no fim da fila
                     if i.matrix_pos_x == self.final_coordinate_x and i.matrix_pos_y == self.final_coordinate_y: # verificar se é o final do labirinto
-                        print("-------------------------------------------------debug")
                         find = True
             self.render(background)
-            CLOCK.tick(50)
+            player.render(background)
+            pygame.display.update()
+        
+        current = self.maze[self.final_coordinate_x][self.final_coordinate_y]
+        while (current.parent).parent != None:
+            current = current.parent
+            current.color = ORANGE
+
+            if current.top_border.color == PINK:
+                current.top_border.color = ORANGE
+            if current.bottom_border.color == PINK:
+                current.bottom_border.color = ORANGE
+            if current.right_border.color == PINK:
+                current.right_border.color = ORANGE
+            if current.left_border.color == PINK:
+                current.left_border.color = ORANGE
+
+            self.render(background)
             pygame.display.update()
     
     def render(self, background):
@@ -257,8 +280,8 @@ class Player():
         self.height = SIZE - 2 * BORDER_THICKNESS
         self.color = RED
 
-    def update(self, maze):
-        for event in pygame.event.get():
+    def update(self, maze, events):
+        for event in events:
             if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_LEFT and self.pos_x > BORDER_THICKNESS and (maze[self.matrix_pos_x][self.matrix_pos_y].left_border.color != BLACK):
                     self.pos_x -= SIZE
@@ -283,6 +306,7 @@ class Game():
         except:
             print('The pygame module did not start successfully')
 
+        self.start = False
         self.exit = False
 
     def load(self):
@@ -297,12 +321,21 @@ class Game():
             final_coordinate_y = random.randint(0, int(WIDTH / SIZE) - 1)
         self.maze = Maze(self.background, initial_coordinate_x, initial_coordinate_y, final_coordinate_x, final_coordinate_y)
         self.player = Player(initial_coordinate_x, initial_coordinate_y)
-        
-    def unload(self):
-        pass
 
-    def update(self):
-        self.player.update(self.maze.maze)
+    def update(self, event):
+        self.player.update(self.maze.maze, event)
+
+    def initial_game(self):
+        self.background.fill(DARKSLATEGRAY)
+        pygame.draw.rect(self.background, GRAY, [100, 100, 400, 450])
+        text(self.background, "MAZE ADVENTURES", WHITE, FONTSIZE_START, 125, 185)
+        pygame.draw.rect(self.background, YELLOW, [150, 310, 300, 100])
+        text(self.background, "PRESS (S) TO START GAME", BLACK, FONTSIZE_COMMANDS_INTIAL, 180, 330)
+        text(self.background, "PRESS (ESC) TO CLOSE GAME", BLACK, FONTSIZE_COMMANDS_INTIAL, 175, 360)
+
+    def end_of_game(self):
+        
+        self.maze.bfs(self.background, self.player)
 
     def render(self):
         self.background.fill(BLACK)
@@ -310,18 +343,41 @@ class Game():
         self.maze.render(self.background)
 
         self.player.render(self.background)
+
+        text(self.background, "PRESS (R) TO RETRY GAME", WHITE, FONTSIZE_MAZE, 230, 610)
+        text(self.background, "PRESS (Q) TO GIVE UP", WHITE, FONTSIZE_MAZE, 232, 630)
+        text(self.background, "PRESS (ESC) TO CLOSE GAME", WHITE, FONTSIZE_MAZE, 222, 650)
+
         pygame.display.update()
 
     def run(self):
         self.load()
+        self.initial_game()
+        pygame.display.update()
+        while not self.start:
+            for event in pygame.event.get():
+                if event.type == pygame.KEYDOWN and event.key == pygame.K_s:
+                    self.start = True
+                elif event.type == pygame.KEYUP and event.key == pygame.K_s:
+                    self.start = False
+        pygame.display.update()
+
+        self.background.fill(BLACK)
+        self.maze.dfs(self.background)
 
         while not self.exit:
             if pygame.event.get(pygame.QUIT) or pygame.key.get_pressed()[pygame.K_ESCAPE]:
                 self.exit = True
-
-            self.update()
+            e = pygame.event.get()
+            for event in e:
+                if event.type == pygame.KEYDOWN:
+                    if event.key == pygame.K_r:
+                        self.run()
+                    if event.key == pygame.K_q:
+                        self.end_of_game()
+            self.update(e)
             self.render()
-        
+
         pygame.quit()
         
 def main():
