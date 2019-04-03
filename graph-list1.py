@@ -1,6 +1,7 @@
 import sys
 import pygame
 import random
+import time
 
 WHITE = (255, 255, 255)
 BLACK = (0, 0, 0)
@@ -12,11 +13,12 @@ PINK = (225, 96, 253)
 BLUE = (0, 0, 255)
 BROWN = (139, 69, 19)
 ORANGE = (255, 99, 71)
-DARKSLATEGRAY = (47, 79, 79)
 GRAY = (119, 136, 153)
-DARKBLUE = (0, 0, 139)
-MIDNIGHTBLUE = (25, 25, 1, 12)
-DARKRED = (139, 0, 0)
+LIGHTORANGE = (255, 176, 56)
+INTERMEDIARYORANGE = (255, 154, 0) 
+LIGHTBLUE = (60, 170, 255)
+DARKBLUE = (0, 101, 178)
+BEIGE = (178, 168, 152)
 
 BORDER_THICKNESS = 1.0
 
@@ -29,10 +31,12 @@ FONTSIZE_START = 50
 FONTSIZE_COMMANDS_INTIAL = 25
 FONTSIZE_MAZE = 20
 
-SIZE = 20
+SIZE = 25
+
+CLOCK = pygame.time.Clock()
 
 def text(background, message, color, size, coordinate_x, coordinate_y):
-    font = pygame.font.SysFont(None, size)
+    font = pygame.font.SysFont("comicsansms", size)
     text = font.render(message, True, color)
     background.blit(text, [coordinate_x, coordinate_y])
 
@@ -205,7 +209,7 @@ class Maze():
                     stack.pop()
                     current_cell = stack[-1]
             self.render(background)
-            text(background, "GENERATING MAZE", WHITE, FONTSIZE_COMMANDS_INTIAL, 225, 620)
+            text(background, "GENERATING MAZE", WHITE, FONTSIZE_COMMANDS_INTIAL, 215, 620)
             pygame.display.update()
         self.maze_created = True
     
@@ -235,7 +239,7 @@ class Maze():
                     if i.matrix_pos_x == self.final_coordinate_x and i.matrix_pos_y == self.final_coordinate_y:
                         find = True
             self.render(background)
-            text(background, "SOLVING MAZE", WHITE, FONTSIZE_COMMANDS_INTIAL, 228, 620)
+            text(background, "SOLVING MAZE", WHITE, FONTSIZE_COMMANDS_INTIAL, 218, 620)
             player.render(background)
             pygame.display.update()
         
@@ -330,13 +334,18 @@ class Game():
             self.winner = True
 
     def initial_game(self):
-        self.background.fill(MIDNIGHTBLUE)
-        pygame.draw.rect(self.background, DARKBLUE, [100, 100, 400, 450])
-        pygame.draw.rect(self.background, DARKRED, [110, 150, 380, 100])
-        text(self.background, "MAZE ADVENTURES", BLACK, FONTSIZE_START, 125, 185)
-        pygame.draw.rect(self.background, BLACK, [150, 320, 300, 100])
-        text(self.background, "PRESS (S) TO START GAME", ORANGE, FONTSIZE_COMMANDS_INTIAL, 180, 345)
-        text(self.background, "PRESS (ESC) TO CLOSE GAME", ORANGE, FONTSIZE_COMMANDS_INTIAL, 175, 375)
+        self.background.fill(DARKBLUE)
+        pygame.draw.rect(self.background, BEIGE, [40, 40, 530, 580])
+        pygame.draw.rect(self.background, LIGHTBLUE, [40, 100, 530, 450])
+        pygame.draw.rect(self.background, BLACK, [110, 150, 380, 350])
+        pygame.draw.rect(self.background, DARKBLUE, [110, 150, 380, 100])
+        text(self.background, "MAZE ADVENTURES", LIGHTORANGE, FONTSIZE_START, 125, 185)
+        text(self.background, "PRESS (ESC) TO CLOSE GAME", INTERMEDIARYORANGE, FONTSIZE_COMMANDS_INTIAL + 5, 150, 375)
+        pygame.display.update()
+        pygame.time.wait(180)
+        text(self.background, "PRESS (S) TO START GAME", INTERMEDIARYORANGE, FONTSIZE_COMMANDS_INTIAL + 5, 160, 350)
+        pygame.display.update()
+        pygame.time.wait(180)
 
     def end_of_game(self):
         self.maze.bfs(self.background, self.player)
@@ -349,25 +358,25 @@ class Game():
         self.player.render(self.background)
 
         if not self.solved and not self.winner:
-            text(self.background, "PRESS (R) TO RETRY GAME", WHITE, FONTSIZE_MAZE, 230, 610)
-            text(self.background, "PRESS (Q) TO GIVE UP", WHITE, FONTSIZE_MAZE, 236, 630)
-            text(self.background, "PRESS (ESC) TO CLOSE GAME", WHITE, FONTSIZE_MAZE, 222, 650)
+            text(self.background, "PRESS (R) TO RETRY GAME", WHITE, FONTSIZE_MAZE, 220, 610)
+            text(self.background, "PRESS (Q) TO GIVE UP", WHITE, FONTSIZE_MAZE, 226, 630)
+            text(self.background, "PRESS (ESC) TO CLOSE GAME", WHITE, FONTSIZE_MAZE, 212, 650)
         elif self.winner:
-            text(self.background, "YOU WIN", WHITE, FONTSIZE_MAZE + 3, 265, 610)
-            text(self.background, "PRESS (R) TO RETRY GAME", WHITE, FONTSIZE_MAZE, 225, 630)
-            text(self.background, "PRESS (ESC) TO CLOSE GAME", WHITE, FONTSIZE_MAZE, 220, 650)
+            text(self.background, "YOU WIN", WHITE, FONTSIZE_MAZE + 3, 255, 610)
+            text(self.background, "PRESS (R) TO RETRY GAME", WHITE, FONTSIZE_MAZE, 215, 630)
+            text(self.background, "PRESS (ESC) TO CLOSE GAME", WHITE, FONTSIZE_MAZE, 210, 650)
         else:
-            text(self.background, "YOU LOSE", WHITE, FONTSIZE_MAZE + 3, 265, 610)
-            text(self.background, "PRESS (R) TO RETRY GAME", WHITE, FONTSIZE_MAZE, 225, 630)
-            text(self.background, "PRESS (ESC) TO CLOSE GAME", WHITE, FONTSIZE_MAZE, 220, 650)
+            text(self.background, "YOU LOSE", WHITE, FONTSIZE_MAZE + 3, 255, 610)
+            text(self.background, "PRESS (R) TO RETRY GAME", WHITE, FONTSIZE_MAZE, 215, 630)
+            text(self.background, "PRESS (ESC) TO CLOSE GAME", WHITE, FONTSIZE_MAZE, 210, 650)
 
         pygame.display.update()
 
     def run(self):
         self.load()
-        self.initial_game()
-        pygame.display.update()
         while not self.start:
+            self.initial_game()
+            pygame.display.update()
             if pygame.event.get(pygame.QUIT) or pygame.key.get_pressed()[pygame.K_ESCAPE]:
                 pygame.quit()
                 sys.exit(0)
