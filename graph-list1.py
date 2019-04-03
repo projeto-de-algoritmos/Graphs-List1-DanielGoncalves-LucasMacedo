@@ -41,6 +41,7 @@ class Node():
         self.color = BLUE
 
         self.visited = False
+        self.explored = False
 
         self.matrix_pos_x = 0
         self.matrix_pos_y = 0
@@ -89,6 +90,7 @@ class Maze():
 
         self.define_neighbors()
         self.dfs(background)
+        self.bfs(background)
 
     def add_edge(self, node, neighbor):
         neighbor.neighbors_connected.append(node)
@@ -202,13 +204,41 @@ class Maze():
                     stack.pop()
                     current_cell = stack[-1]
             self.render(background)
-            CLOCK.tick(100)
+            CLOCK.tick(200)
             pygame.display.update()
         self.maze_created = True
     
-    def bfs(self):
-        pass
-                    
+    def bfs(self, background):
+        initial_node = self.maze[self.initial_coordinate_x][self.initial_coordinate_y]
+        initial_node.explored = True
+        find = False
+        explored = [initial_node]
+        queue = [initial_node]
+        while len(queue) > 0 and not find:
+            queue[0].color = PINK # pintar primeiro nó da fila -> u
+
+            if queue[0].top_border.color == YELLOW:
+                queue[0].top_border.color = PINK
+            if queue[0].bottom_border.color == YELLOW:
+                queue[0].bottom_border.color = PINK
+            if queue[0].right_border.color == YELLOW:
+                queue[0].right_border.color = PINK
+            if queue[0].left_border.color == YELLOW:
+                queue[0].left_border.color = PINK
+
+            u = queue.pop(0) # remover primeiro nó da fila -> u
+            for i in u.neighbors_connected: # para cada v (nó vizinho) de u
+                if i.explored == False: # se v não foi explorado
+                    i.explored = True # marque v como explorado
+                    explored.append(i)
+                    queue.append(i) # coloque v no fim da fila
+                    if i.matrix_pos_x == self.final_coordinate_x and i.matrix_pos_y == self.final_coordinate_y: # verificar se é o final do labirinto
+                        print("-------------------------------------------------debug")
+                        find = True
+            self.render(background)
+            CLOCK.tick(50)
+            pygame.display.update()
+    
     def render(self, background):
         for i in range(0, int(HEIGHT / SIZE)):
             for j in range(0, int(WIDTH / SIZE)):
@@ -258,10 +288,13 @@ class Game():
     def load(self):
         self.background = pygame.display.set_mode(SCREEN_SIZE)
         pygame.display.set_caption('Maze Game')
-        initial_coordinate_x = random.randint(0, int(HEIGHT / SIZE))
-        initial_coordinate_y = random.randint(0, int(WIDTH / SIZE))
-        final_coordinate_x = random.randint(0, int(HEIGHT / SIZE))
-        final_coordinate_y = random.randint(0, int(WIDTH / SIZE))
+        initial_coordinate_x = random.randint(0, int(HEIGHT / SIZE) - 1)
+        initial_coordinate_y = random.randint(0, int(WIDTH / SIZE) - 1)
+        final_coordinate_x = random.randint(0, int(HEIGHT / SIZE) - 1)
+        final_coordinate_y = random.randint(0, int(WIDTH / SIZE) - 1)
+        while final_coordinate_x == initial_coordinate_x or final_coordinate_y == initial_coordinate_y:
+            final_coordinate_x = random.randint(0, int(HEIGHT / SIZE) - 1)
+            final_coordinate_y = random.randint(0, int(WIDTH / SIZE) - 1)
         self.maze = Maze(self.background, initial_coordinate_x, initial_coordinate_y, final_coordinate_x, final_coordinate_y)
         self.player = Player(initial_coordinate_x, initial_coordinate_y)
         
