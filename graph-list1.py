@@ -202,7 +202,7 @@ class Maze():
                     stack.pop()
                     current_cell = stack[-1]
             self.render(background)
-            CLOCK.tick(60)
+            CLOCK.tick(100)
             pygame.display.update()
         self.maze_created = True
     
@@ -265,7 +265,6 @@ class Game():
         self.maze = Maze(self.background, initial_coordinate_x, initial_coordinate_y, final_coordinate_x, final_coordinate_y)
         self.player = Player(initial_coordinate_x, initial_coordinate_y)
         
-                
     def unload(self):
         pass
 
