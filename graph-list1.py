@@ -1,4 +1,4 @@
-
+import sys
 import pygame
 import random
 
@@ -242,6 +242,7 @@ class Maze():
                     if i.matrix_pos_x == self.final_coordinate_x and i.matrix_pos_y == self.final_coordinate_y: # verificar se é o final do labirinto
                         find = True
             self.render(background)
+            text(background, "SOLVING MAZE", WHITE, FONTSIZE_COMMANDS_INTIAL, 220, 620)
             player.render(background)
             pygame.display.update()
         
@@ -260,6 +261,7 @@ class Maze():
                 current.left_border.color = ORANGE
 
             self.render(background)
+            player.render(background)
             pygame.display.update()
     
     def render(self, background):
@@ -306,6 +308,7 @@ class Game():
         except:
             print('The pygame module did not start successfully')
 
+        self.solved = False
         self.start = False
         self.exit = False
 
@@ -323,7 +326,8 @@ class Game():
         self.player = Player(initial_coordinate_x, initial_coordinate_y)
 
     def update(self, event):
-        self.player.update(self.maze.maze, event)
+        if not self.solved:
+            self.player.update(self.maze.maze, event)
 
     def initial_game(self):
         self.background.fill(DARKSLATEGRAY)
@@ -343,11 +347,13 @@ class Game():
         self.maze.render(self.background)
 
         self.player.render(self.background)
-
-        text(self.background, "PRESS (R) TO RETRY GAME", WHITE, FONTSIZE_MAZE, 230, 610)
-        text(self.background, "PRESS (Q) TO GIVE UP", WHITE, FONTSIZE_MAZE, 232, 630)
-        text(self.background, "PRESS (ESC) TO CLOSE GAME", WHITE, FONTSIZE_MAZE, 222, 650)
-
+        if not self.solved:
+            text(self.background, "PRESS (R) TO RETRY GAME", WHITE, FONTSIZE_MAZE, 230, 610)
+            text(self.background, "PRESS (Q) TO GIVE UP", WHITE, FONTSIZE_MAZE, 232, 630)
+            text(self.background, "PRESS (ESC) TO CLOSE GAME", WHITE, FONTSIZE_MAZE, 222, 650)
+        else:
+            text(self.background, "PRESS (R) TO RETRY GAME", WHITE, FONTSIZE_MAZE, 230, 620)
+            text(self.background, "PRESS (ESC) TO CLOSE GAME", WHITE, FONTSIZE_MAZE, 222, 640)
         pygame.display.update()
 
     def run(self):
@@ -355,11 +361,12 @@ class Game():
         self.initial_game()
         pygame.display.update()
         while not self.start:
+            if pygame.event.get(pygame.QUIT) or pygame.key.get_pressed()[pygame.K_ESCAPE]:
+                pygame.quit()
+                sys.exit(0)
             for event in pygame.event.get():
                 if event.type == pygame.KEYDOWN and event.key == pygame.K_s:
                     self.start = True
-                elif event.type == pygame.KEYUP and event.key == pygame.K_s:
-                    self.start = False
         pygame.display.update()
 
         self.background.fill(BLACK)
@@ -372,13 +379,17 @@ class Game():
             for event in e:
                 if event.type == pygame.KEYDOWN:
                     if event.key == pygame.K_r:
+                        self.solved = False
                         self.run()
-                    if event.key == pygame.K_q:
+                    if not self.solved and event.key == pygame.K_q:
+                        self.background.fill(BLACK)
                         self.end_of_game()
+                        self.solved = True
             self.update(e)
             self.render()
 
         pygame.quit()
+        sys.exit(0)
         
 def main():
     mygame = Game()
