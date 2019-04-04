@@ -2,10 +2,10 @@
 
 ## Autors
 
-| Name  | Registration  |
-|---|---|
-| Daniel Maike Mendes Gonçalves  | 16/0117003  |
-| Lucas Pereira de Andrade Macêdo  | 15/0137397  |
+| Name  | University Registration  | GitHub | Email |
+|---|---|---|---|
+| Daniel Maike Mendes Gonçalves  | 16/0117003  | [DanMke](https://github.com/DanMke) | danmke@hotmail.com |
+| Lucas Pereira de Andrade Macêdo  | 15/0137397  | [lukassxp](https://github.com/lukassxp) | lpalucas.10@gmail.com |
 
 ## Installation
 
