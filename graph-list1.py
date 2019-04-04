@@ -265,8 +265,8 @@ class Maze():
             for j in range(0, int(WIDTH / SIZE)):
                 self.maze[i][j].render(background)
         if self.maze_created:
-            self.maze[self.initial_coordinate_x][self.initial_coordinate_y].color = BROWN
-            self.maze[self.final_coordinate_x][self.final_coordinate_y].color = BLUE
+            self.maze[self.initial_coordinate_x][self.initial_coordinate_y].color = BEIGE
+            self.maze[self.final_coordinate_x][self.final_coordinate_y].color = LIGHTBLUE
 
 class Player():
     def __init__(self, initial_x, initial_y):
@@ -357,17 +357,24 @@ class Game():
         self.player.render(self.background)
 
         if not self.solved and not self.winner:
+            pygame.draw.rect(self.background, RED, [0, 601, SIZE, SIZE])
+            text(self.background, "- PLAYER", WHITE, FONTSIZE_MAZE, 0 + SIZE + 3, 601 + 6)
+            pygame.draw.rect(self.background, BEIGE, [0, 601 + SIZE + 1, SIZE, SIZE])
+            text(self.background, "- STARTING POINT", WHITE, FONTSIZE_MAZE, 0 + SIZE + 3, 601 + SIZE + 1 + 6)
+            pygame.draw.rect(self.background, LIGHTBLUE, [0, 601 + 2 * SIZE + 2, SIZE, SIZE])
+            text(self.background, "- GOAL", WHITE, FONTSIZE_MAZE, 0 + SIZE + 3, 601 + 2 * SIZE + 1 + 6)
+
             text(self.background, "PRESS (R) TO RETRY GAME", WHITE, FONTSIZE_MAZE, 220, 610)
-            text(self.background, "PRESS (Q) TO GIVE UP", WHITE, FONTSIZE_MAZE, 226, 630)
+            text(self.background, "PRESS (Q) TO GIVE UP", WHITE, FONTSIZE_MAZE, 230, 630)
             text(self.background, "PRESS (ESC) TO CLOSE GAME", WHITE, FONTSIZE_MAZE, 212, 650)
         elif self.winner:
-            text(self.background, "YOU WIN", WHITE, FONTSIZE_MAZE + 3, 255, 610)
-            text(self.background, "PRESS (R) TO RETRY GAME", WHITE, FONTSIZE_MAZE, 215, 630)
-            text(self.background, "PRESS (ESC) TO CLOSE GAME", WHITE, FONTSIZE_MAZE, 210, 650)
+            text(self.background, "YOU WIN", BLUE, FONTSIZE_MAZE + 3, 264, 610)
+            text(self.background, "PRESS (R) TO RETRY GAME", WHITE, FONTSIZE_MAZE, 220, 630)
+            text(self.background, "PRESS (ESC) TO CLOSE GAME", WHITE, FONTSIZE_MAZE, 212, 650)
         else:
-            text(self.background, "YOU LOSE", WHITE, FONTSIZE_MAZE + 3, 255, 610)
-            text(self.background, "PRESS (R) TO RETRY GAME", WHITE, FONTSIZE_MAZE, 215, 630)
-            text(self.background, "PRESS (ESC) TO CLOSE GAME", WHITE, FONTSIZE_MAZE, 210, 650)
+            text(self.background, "YOU LOSE", RED, FONTSIZE_MAZE + 3, 262, 610)
+            text(self.background, "PRESS (R) TO RETRY GAME", WHITE, FONTSIZE_MAZE, 220, 630)
+            text(self.background, "PRESS (ESC) TO CLOSE GAME", WHITE, FONTSIZE_MAZE, 212, 650)
 
         pygame.display.update()
 
