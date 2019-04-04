@@ -85,7 +85,7 @@ if one pulled and stretched out the paths in the maze in the proper way, the res
 
 ## References
 
-https://gifs.com/ <br>
-https://en.wikipedia.org/wiki/Maze <br>
-https://en.wikipedia.org/wiki/Maze_generation_algorithm <br>
-https://en.wikipedia.org/wiki/Maze_solving_algorithm
+> https://gifs.com/ <br>
+> https://en.wikipedia.org/wiki/Maze <br>
+> https://en.wikipedia.org/wiki/Maze_generation_algorithm <br>
+> https://en.wikipedia.org/wiki/Maze_solving_algorithm
