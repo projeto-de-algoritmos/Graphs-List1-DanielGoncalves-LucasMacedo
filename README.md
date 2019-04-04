@@ -49,16 +49,16 @@ if one pulled and stretched out the paths in the maze in the proper way, the res
 
 #### Recursive backtracker using Depth-First Search
 
-> 1. Make the initial cell the current cell and mark it as visited
-> 2. While there are unvisited cells
->>      1. If the current cell has any neighbours which have not been visited
->>>             1. Choose randomly one of the unvisited neighbours
->>>             2. Push the current cell to the stack
->>>             3. Remove the wall between the current cell and the chosen cell
->>>             4. Make the chosen cell the current cell and mark it as visited
->>      2. Else if stack is not empty
->>>             1. Pop a cell from the stack
->>>             2. Make it the current cell
+- 1. Make the initial cell the current cell and mark it as visited <br>
+- 2. While there are unvisited cells <br>
+    - 1. If the current cell has any neighbours which have not been visited <br>
+        - 1. Choose randomly one of the unvisited neighbours <br>
+        - 2. Push the current cell to the stack <br>
+        - 3. Remove the wall between the current cell and the chosen cell <br>
+        - 4. Make the chosen cell the current cell and mark it as visited <br>
+    - 2. Else if stack is not empty <br>
+        - 1. Pop a cell from the stack <br>
+        - 2. Make it the current cell <br>
 
 <br> ![generate-maze](gifs/generate_maze.gif) <br>
 
@@ -66,20 +66,20 @@ if one pulled and stretched out the paths in the maze in the proper way, the res
 
 #### Breadth-First Search
 
-> 1. Define an initial node, marking as exploited
-> 2. Add it to the queue
-> 3. While the queue is not empty and you have not found the end of the maze
->> 	1. Remove the first node from the queue, **U**
->> 	2. For each neighbor **V** of **U**
->>>             1. If you have not explored
->>>>             	1. Mark U as the parent of V
->>>>               	2. Mark V as scanned
->>>>               	3. Put V at the end of the queue.
->>>>               	4. If V is the end of the maze
->>>>>                 	1. The end was found
-> 4. Define the current node as the end of the maze
-> 5. While the father of the node's parent is not empty
->>      1. Assign the current node as your parent, to walk the way back
+- 1. Define an initial node, marking as exploited <br>
+- 2. Add it to the queue <br>
+- 3. While the queue is not empty and you have not found the end of the maze <br>
+      - 1. Remove the first node from the queue, **U** <br>
+      - 2. For each neighbor **V** of **U** <br>
+        - 1. If you have not explored <br>
+            - 1. Mark **U** as the parent of **V** <br>
+            - 2. Mark **V** as explored <br>
+            - 3. Put **V** at the end of the queue. <br>
+            - 4. If **V** is the end of the maze <br>
+                - 1. The end was found <br>
+- 4. Define the current node as the end of the maze <br>
+- 5. While the father of the node's parent is not empty <br>
+    - 1. Assign the current node as your parent, to walk the way back <br>
        
 <br> ![solving-maze](gifs/solving_maze.gif) <br>
 
