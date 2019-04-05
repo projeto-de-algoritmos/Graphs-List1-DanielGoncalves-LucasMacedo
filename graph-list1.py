@@ -32,8 +32,6 @@ FONTSIZE_MAZE = 20
 
 SIZE = 25
 
-CLOCK = pygame.time.Clock()
-
 def text(background, message, color, size, coordinate_x, coordinate_y):
     font = pygame.font.SysFont(None, size)
     text = font.render(message, True, color)
